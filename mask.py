@@ -93,8 +93,8 @@ class Masks(list):
         result.sort(key=itemgetter(2))
         return np.array(result)
 
-    def xywh(self):
-        return [s.xywh for x in self]
+    def get_xywh(self):
+        return [s.xywh for s in self]
 
 
 class MaskRCNN():

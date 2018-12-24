@@ -51,7 +51,7 @@ def main(mask_rcnn):
         masks = mask_rcnn.detect_people(frame)
         boxs = masks.get_xywh()
         # print("box_num",len(boxs))
-        features = encoder(frame,boxs)
+        features = encoder(frame, boxs)
 
         # score to 1.0 here).
         detections = [Detection(bbox, 1.0, feature) for bbox, feature in zip(boxs, features)]
@@ -70,7 +70,9 @@ def main(mask_rcnn):
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
             bbox = track.to_tlbr()
-            cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+
+            image_utils.apply_masks_to_image_np(frame, masks)
+            #cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
             cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
 
         for det in detections:
