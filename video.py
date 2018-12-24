@@ -18,6 +18,7 @@ from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imageio
+import image_utils
 warnings.filterwarnings('ignore')
 
 def get_filename(filename):
@@ -65,13 +66,13 @@ def main(mask_rcnn):
         # Call the tracker
         tracker.predict()
         tracker.update(detections)
+        image_utils.apply_masks_to_image_np(frame, masks)
 
         for track in tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
             bbox = track.to_tlbr()
 
-            image_utils.apply_masks_to_image_np(frame, masks)
             #cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
             cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
 
