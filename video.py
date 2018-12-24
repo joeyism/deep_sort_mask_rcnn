@@ -4,12 +4,12 @@ from __future__ import division, print_function, absolute_import
 import sys
 import os
 
-from timeit import time
 import warnings
 import cv2
 import numpy as np
 from PIL import Image
 from yolo import YOLO
+from mask import MaskRCNN
 from tqdm import tqdm
 
 from deep_sort import preprocessing
@@ -17,7 +17,6 @@ from deep_sort import nn_matching
 from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
-from deep_sort.detection import Detection as ddet
 import imageio
 warnings.filterwarnings('ignore')
 
@@ -25,7 +24,7 @@ def get_filename(filename):
     split = os.path.splitext(filename)
     return split[0].split("/")[-1] + split[1]
 
-def main(yolo):
+def main(mask_rcnn):
 
     filename = sys.argv[1]
    # Definition of the parameters
@@ -49,11 +48,9 @@ def main(yolo):
 
     for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
 
-        t1 = time.time()
-
-        image = Image.fromarray(frame)
-        boxs = yolo.detect_image(image)
-       # print("box_num",len(boxs))
+        masks = mask_rcnn.detect_people(frame)
+        boxs = masks.get_xywh()
+        # print("box_num",len(boxs))
         features = encoder(frame,boxs)
 
         # score to 1.0 here).
@@ -85,4 +82,4 @@ def main(yolo):
     writer.close()
 
 if __name__ == '__main__':
-    main(YOLO())
+    main(MaskRCNN())

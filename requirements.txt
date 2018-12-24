@@ -1,5 +1,10 @@
 opencv-python 
 Pillow
 scikit-learn
+scikit-image
 imageio
 tqdm
+Cython
+git+https://github.com/waleedka/coco.git#subdirectory=PythonAPI
+keras==2.1.6
+numpy

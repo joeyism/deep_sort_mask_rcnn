@@ -1,0 +1,3 @@
+[submodule "player_recognition"]
+	path = player_recognition
+	url = git@github.com:joeyism/tf-player-recognition.git
