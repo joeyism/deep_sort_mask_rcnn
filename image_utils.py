@@ -2,6 +2,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
+import cv2
 
 
 classified_colours = {

@@ -50,14 +50,18 @@ def main(mask_rcnn):
     for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
 
         masks = mask_rcnn.detect_people(frame)
-        masks = image_utils.classify_masks(masks, by="average_colour"):
+
+        for i, mask in enumerate(masks):
+            mask.average_colour = image_utils.remove_background_and_average_colour(mask.masked_image_np)
+
+        masks = image_utils.classify_masks(masks, by="average_colour")
         boxs = masks.get_xywh()
 
         # print("box_num",len(boxs))
         features = encoder(frame, boxs)
 
         # score to 1.0 here).
-        detections = [Detection(mask.get_xywh(), mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
+        detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
 
         # Run non-maxima suppression.
         boxes = np.array([d.tlwh for d in detections])
@@ -70,7 +74,7 @@ def main(mask_rcnn):
         tracker.update(detections)
        # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
 
-        image_utils.draw_player_with_tracks(frame, tracker.tracks):
+        image_utils.draw_player_with_tracks(frame, tracker.tracks)
         writer.append_data(frame)
 
     writer.close()
