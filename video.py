@@ -50,36 +50,27 @@ def main(mask_rcnn):
     for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
 
         masks = mask_rcnn.detect_people(frame)
+        masks = image_utils.classify_masks(masks, by="average_colour"):
         boxs = masks.get_xywh()
+
         # print("box_num",len(boxs))
         features = encoder(frame, boxs)
 
         # score to 1.0 here).
-        detections = [Detection(bbox, 1.0, feature) for bbox, feature in zip(boxs, features)]
+        detections = [Detection(mask.get_xywh(), mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
 
         # Run non-maxima suppression.
         boxes = np.array([d.tlwh for d in detections])
         scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
         detections = [detections[i] for i in indices]
 
         # Call the tracker
         tracker.predict()
         tracker.update(detections)
-        image_utils.apply_masks_to_image_np(frame, masks)
+       # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
 
-        for track in tracker.tracks:
-            if not track.is_confirmed() or track.time_since_update > 1:
-                continue
-            bbox = track.to_tlbr()
-
-            #cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-            cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
-
-        for det in detections:
-            bbox = det.to_tlbr()
-            cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
-
+        image_utils.draw_player_with_tracks(frame, tracker.tracks):
         writer.append_data(frame)
 
     writer.close()

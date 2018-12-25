@@ -39,6 +39,7 @@ class Mask(object):
     colour = None
     boundary_index = None
     center = None
+    kmeans_label = None
 
 
     def __init__(self, class_id, mask, rois, score, masked_image):

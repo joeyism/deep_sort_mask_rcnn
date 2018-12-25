@@ -5,10 +5,10 @@ import PIL.ImageDraw as ImageDraw
 
 
 classified_colours = {
-        0: (0, 0, 0),
-        1: (255, 255, 255),
-        2: (125, 200, 255)
-        }
+    0: (0, 0, 0),
+    1: (255, 255, 255),
+    2: (125, 200, 255)
+}
 
 
 def gen_xywh_from_box(box):
@@ -60,6 +60,7 @@ def classify_masks(masks, by="average_colour"):
     for i, mask in enumerate(masks):
         mask.classify = translator[kmeans.labels_[i]]
         mask.drawn_colour = classified_colours[mask.classify]
+        mask.kmeans_label = kmeans.labels_[i]
 
     return masks
 
@@ -114,6 +115,13 @@ def apply_masks_to_image_np(image_np, masks):
     masks = classify_masks(masks, by="average_colour")
     draw_classified_ellipses_around_masks(image_np, masks)
     draw_lines_between_classified_players(image_np, masks)
-    return image_np
+    return image_np, masks
 
 
+def draw_player_with_tracks(image_np, tracks):
+    for track in tracks:
+        if not track.is_confirmed() or track.time_since_update > 1:
+            continue
+        bbox = track.to_tlbr()
+        cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), classified_colours[track.team_id], 2)
+        cv2.putText(image_np, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, classified_colours[track.team_id], 2)

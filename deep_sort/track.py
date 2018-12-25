@@ -37,6 +37,8 @@ class Track:
     max_age : int
         The maximum number of consecutive misses before the track state is
         set to `Deleted`.
+    team_id : int
+        Team that it's detected to be on
     feature : Optional[ndarray]
         Feature vector of the detection this track originates from. If not None,
         this feature is added to the `features` cache.
@@ -57,13 +59,15 @@ class Track:
         Total number of frames since last measurement update.
     state : TrackState
         The current track state.
+    team_id : int
+        Team that it's detected to be on
     features : List[ndarray]
         A cache of features. On each measurement update, the associated feature
         vector is added to this list.
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age,
+    def __init__(self, mean, covariance, track_id, n_init, max_age, team_id,
                  feature=None):
         self.mean = mean
         self.covariance = covariance
@@ -76,7 +80,7 @@ class Track:
         self.features = []
         if feature is not None:
             self.features.append(feature)
-
+        self.team_id = team_id
         self._n_init = n_init
         self._max_age = max_age
 
