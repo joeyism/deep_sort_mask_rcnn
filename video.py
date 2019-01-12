@@ -47,37 +47,38 @@ def main(mask_rcnn):
 
     writer = imageio.get_writer("output/" + get_filename(filename) , fps=fps)
 
-    for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
+    try:
+        for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
 
-        masks = mask_rcnn.detect_people(frame)
+            masks = mask_rcnn.detect_people(frame)
 
-        for i, mask in enumerate(masks):
-            mask.average_colour = image_utils.remove_background_and_average_colour(mask.masked_image_np)
+            for i, mask in enumerate(masks):
+                mask.average_colour = image_utils.remove_background_and_average_colour(mask.masked_image_np)
 
-        masks = image_utils.classify_masks(masks, by="average_colour")
-        boxs = masks.get_xywh()
+            masks = image_utils.classify_masks(masks, by="average_colour")
+            boxs = masks.get_xywh()
 
-        # print("box_num",len(boxs))
-        features = encoder(frame, boxs)
+            # print("box_num",len(boxs))
+            features = encoder(frame, boxs)
 
-        # score to 1.0 here).
-        detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
+            # score to 1.0 here).
+            detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
 
-        # Run non-maxima suppression.
-        boxes = np.array([d.tlwh for d in detections])
-        scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
-        detections = [detections[i] for i in indices]
+            # Run non-maxima suppression.
+            boxes = np.array([d.tlwh for d in detections])
+            scores = np.array([d.confidence for d in detections])
+            indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
+            detections = [detections[i] for i in indices]
 
-        # Call the tracker
-        tracker.predict()
-        tracker.update(detections)
-       # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
+            # Call the tracker
+            tracker.predict()
+            tracker.update(detections)
+           # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
 
-        image_utils.draw_player_with_tracks(frame, tracker.tracks)
-        writer.append_data(frame)
-
-    writer.close()
+            image_utils.draw_player_with_tracks(frame, tracker.tracks)
+            writer.append_data(frame)
+    finally:
+        writer.close()
 
 if __name__ == '__main__':
     main(MaskRCNN())
