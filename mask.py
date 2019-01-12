@@ -8,7 +8,6 @@ import player_recognition.model as modellib
 import player_recognition.utils as pr_utils
 import image_utils
 
-from tqdm import tqdm
 import coco
 import numpy as np
 from PIL import Image
