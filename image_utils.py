@@ -3,6 +3,9 @@ import numpy as np
 import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 import cv2
+import scipy
+import scipy.misc
+import scipy.cluster
 
 
 classified_colours = {
@@ -26,9 +29,18 @@ def gen_xywh_from_box(box):
     return x, y, w, h 
 
 
-def remove_background_and_average_colour(image_np):
-    only_coloured_pixels = np.array([pixel for pixel in image_np.reshape((-1, 3)) if pixel.tolist() != [0, 0, 0]])
-    return np.average(only_coloured_pixels, axis=0).astype(int)
+def remove_background_and_average_colour(image_np, NUM_CLUSTERS=5):
+    #only_coloured_pixels = np.array([pixel for pixel in image_np.reshape((-1, 3)) if pixel.tolist() != [0, 0, 0]])
+    #return np.average(only_coloured_pixels, axis=0).astype(int)
+
+    shape = image_np.shape
+    ar = image_np.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+    codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+    vecs, dist = scipy.cluster.vq.vq(ar, codes)         # assign codes
+    counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
+    index_max = scipy.argmax(counts)                    # find most frequent
+    peak = codes[index_max]
+    return tuple(peak)
 
 
 def sort_by_lowest_translator(cluster_centers, n_clusters):

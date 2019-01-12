@@ -1,5 +1,6 @@
 model_data/yolo.h5
 mask_rcnn_coco.h5
 __pycache__/
+**/__pycache__
 *.pyc
 *.swp
