@@ -53,9 +53,9 @@ def main(mask_rcnn):
             masks = mask_rcnn.detect_people(frame)
 
             for i, mask in enumerate(masks):
-                mask.average_colour = image_utils.remove_background_and_average_colour(mask.masked_image_np)
+                mask.average_colour = image_utils.remove_background_and_average_colour(mask.upper_half_np)
 
-            masks = image_utils.classify_masks(masks, by="average_colour")
+            masks = image_utils.classify_masks(masks, by="average_colour") #TODO: divide into teams better
             boxs = masks.get_xywh()
 
             # print("box_num",len(boxs))
