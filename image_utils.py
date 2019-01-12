@@ -29,6 +29,9 @@ def gen_xywh_from_box(box):
     return x, y, w, h 
 
 
+def _int_(tup):
+    return [int(tup_val) for tup_val in tup]
+
 def remove_background_and_average_colour(image_np, NUM_CLUSTERS=5):
     #only_coloured_pixels = np.array([pixel for pixel in image_np.reshape((-1, 3)) if pixel.tolist() != [0, 0, 0]])
     #return np.average(only_coloured_pixels, axis=0).astype(int)
@@ -39,8 +42,10 @@ def remove_background_and_average_colour(image_np, NUM_CLUSTERS=5):
     vecs, dist = scipy.cluster.vq.vq(ar, codes)         # assign codes
     counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
     index_max = scipy.argmax(counts)                    # find most frequent
-    peak = codes[index_max]
-    return tuple(peak)
+    peak = tuple(_int_(codes[index_max]))
+    if peak[0] <= 5 and peak[1] <= 5 and peak[2] <= 5:
+        peak = tuple(_int_(codes[counts.argsort()[-2]]))
+    return peak
 
 
 def sort_by_lowest_translator(cluster_centers, n_clusters):
