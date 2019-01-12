@@ -118,7 +118,7 @@ class MaskRCNN():
         self.config.IMAGES_PER_GPU = 1
 
         masks = []
-        for i, class_id in tqdm(enumerate(r["class_ids"]), desc = "Parsing classes"):
+        for i, class_id in enumerate(r["class_ids"]):
             if class_id != 1:
                 continue
             crop = r["rois"][i] # top left bottom right
