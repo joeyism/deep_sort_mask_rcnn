@@ -55,7 +55,7 @@ def main(mask_rcnn):
             for i, mask in enumerate(masks):
                 mask.average_colour = image_utils.remove_background_and_average_colour(mask.upper_half_np)
 
-            masks = image_utils.classify_masks(masks, by="average_colour") #TODO: divide into teams better
+            masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=3) #TODO: divide into teams better
             boxs = masks.get_xywh()
 
             # print("box_num",len(boxs))

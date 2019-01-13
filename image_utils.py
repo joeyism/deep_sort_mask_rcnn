@@ -60,9 +60,9 @@ def sort_by_lowest_translator(cluster_centers, n_clusters):
     return d
 
 
-def classify_masks(masks, by="average_colour"):
+def classify_masks(masks, by="average_colour", n_clusters=2):
     colours = [mask.__dict__[by] for mask in masks]
-    n_clusters = 2 if len(masks)>=3 else len(masks)
+    n_clusters = n_clusters if len(masks)>=3 else len(masks)
 
     if n_clusters == 0:
         return masks
