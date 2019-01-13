@@ -49,13 +49,12 @@ def main(mask_rcnn):
 
     try:
         for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
-
             masks = mask_rcnn.detect_people(frame)
 
             for i, mask in enumerate(masks):
                 mask.average_colour = image_utils.remove_background_and_average_colour(mask.upper_half_np)
 
-            masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=3) #TODO: divide into teams better
+            masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=2) #TODO: divide into teams better
             boxs = masks.get_xywh()
 
             # print("box_num",len(boxs))
