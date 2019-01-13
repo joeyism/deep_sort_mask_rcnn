@@ -38,13 +38,12 @@ def remove_background_and_average_colour(image_np, NUM_CLUSTERS=5):
 
     shape = image_np.shape
     ar = image_np.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+    ar = np.array([pixel for pixel in ar if pixel.tolist() != [0, 0, 0]])
     codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
     vecs, dist = scipy.cluster.vq.vq(ar, codes)         # assign codes
     counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
     index_max = scipy.argmax(counts)                    # find most frequent
     peak = tuple(_int_(codes[index_max]))
-    if peak[0] <= 5 and peak[1] <= 5 and peak[2] <= 5:
-        peak = tuple(_int_(codes[counts.argsort()[-2]]))
     return peak
 
 
