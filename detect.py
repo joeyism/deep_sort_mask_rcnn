@@ -29,9 +29,7 @@ def get_filename(filename):
 def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
     masks = mask_rcnn.detect_people(frame)
 
-    # skip if it's same number of people. classifying into teams isn't required
-    if len(tracker.tracks) != len(masks):
-        masks = image_utils.classify_masks_with_hash(masks)
+    masks = image_utils.classify_masks_with_hash(masks)
     boxs = masks.get_xywh()
 
     features = encoder(frame, boxs)
