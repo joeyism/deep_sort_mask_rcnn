@@ -14,6 +14,7 @@ classified_colours = {
     2: (125, 200, 255)
 }
 
+kmeans_init = KMeans(n_clusters=2, random_state=0)
 
 def gen_xywh_from_box(box):
     x = int(box[1])  
@@ -163,21 +164,19 @@ def _pixel_is_black_(pixel):
 def _mean_(l):
     return sum(l)/len(l)
 
-def classify_masks_with_hash(masks, n_clusters=2):
+def classify_masks_with_hash(masks):
     all_colours = []
     for i, mask in enumerate(masks):
-        flattened_colour = mask.upper_half_np.reshape((-1, 3))
-        flattened_colour = [pixel for pixel in flattened_colour if not _pixel_is_black_(pixel)]
-        all_colours.append(flattened_colour)
+        mask.flattened_colour = mask.upper_half_np.reshape((-1, 3))
+        mask.flattened_colour = [pixel for pixel in mask.flattened_colour if not _pixel_is_black_(pixel)]
+        all_colours.append(mask.flattened_colour)
 
     all_colours = np.concatenate(all_colours)
-    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(all_colours)
+    kmeans = kmeans_init.fit(all_colours)
 
     colour_label_hashmap = dict(zip([str(colour) for colour in all_colours], kmeans.labels_))
 
     for mask in masks:
-        flattened_colour = mask.upper_half_np.reshape((-1, 3))
-        flattened_colour = [pixel for pixel in flattened_colour if not _pixel_is_black_(pixel)]
-        mask.kmeans_label = round(_mean_([colour_label_hashmap[str(colour)] for colour in flattened_colour]))
+        mask.kmeans_label = round(_mean_([colour_label_hashmap[str(colour)] for colour in mask.flattened_colour]))
     return masks    
 

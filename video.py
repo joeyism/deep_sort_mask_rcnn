@@ -50,7 +50,7 @@ def main(mask_rcnn):
 
     try:
         for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
-            frame = detect(image, tracker, encoder, mask_rcnn)
+            frame = detect(frame, tracker, encoder, mask_rcnn)
             writer.append_data(frame)
     finally:
         writer.close()
