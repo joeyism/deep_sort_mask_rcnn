@@ -37,8 +37,6 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
             mask.average_colour = image_utils.remove_background_and_average_colour(image_cropped, NUM_CLUSTERS = 5)
         masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=2)
 
-    masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=2)
-
     boxs = masks.get_xywh()
 
     features = encoder(frame, boxs)
