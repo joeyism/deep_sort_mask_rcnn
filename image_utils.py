@@ -172,6 +172,9 @@ def classify_masks_with_hash(masks):
         mask.flattened_colour = mask.upper_half_np.reshape((-1, 3))
         mask.flattened_colour = [pixel for pixel in mask.flattened_colour if not _pixel_is_black_(pixel)]
         all_colours.append(mask.flattened_colour)
+    
+    if all_colours == []:
+        return masks
 
     all_colours = np.concatenate(all_colours)
     kmeans = KMeans(n_clusters=2, random_state=0).fit(all_colours)
