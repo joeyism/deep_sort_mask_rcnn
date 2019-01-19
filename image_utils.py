@@ -162,6 +162,9 @@ def _pixel_is_black_(pixel):
 def _mean_(l):
     return sum(l)/len(l)
 
+def _stringify_colour(colour):
+    return "{}, {}, {}".format(colour[0], colour[1], colour[2])
+
 def classify_masks_with_hash(masks):
     all_colours = []
     for i, mask in enumerate(masks):
@@ -175,9 +178,11 @@ def classify_masks_with_hash(masks):
     all_colours = np.concatenate(all_colours)
     kmeans = KMeans(n_clusters=2, random_state=0).fit(all_colours)
 
-    colour_label_hashmap = dict(zip([str(colour) for colour in all_colours], kmeans.labels_))
+    string_colours = [_stringify_colour(colour) for colour in all_colours]
+    zip_colours = zip(string_colours, kmeans.labels_)
+    colour_label_hashmap = dict(zip_colours)
 
     for mask in masks:
-        mask.kmeans_label = round(_mean_([colour_label_hashmap[str(colour)] for colour in mask.flattened_colour]))
+        mask.kmeans_label = round(_mean_([colour_label_hashmap[_stringify_colour(colour)] for colour in mask.flattened_colour]))
     return masks    
 
