@@ -19,6 +19,7 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imageio
 import image_utils
+from detect import detect
 warnings.filterwarnings('ignore')
 
 def get_filename(filename):
@@ -49,32 +50,7 @@ def main(mask_rcnn):
 
     try:
         for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
-            masks = mask_rcnn.detect_people(frame)
-
-            for i, mask in enumerate(masks):
-                mask.average_colour = image_utils.remove_background_and_average_colour(mask.upper_half_np)
-
-            masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=2) #TODO: divide into teams better
-            boxs = masks.get_xywh()
-
-            # print("box_num",len(boxs))
-            features = encoder(frame, boxs)
-
-            # score to 1.0 here).
-            detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
-
-            # Run non-maxima suppression.
-            boxes = np.array([d.tlwh for d in detections])
-            scores = np.array([d.confidence for d in detections])
-            indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
-            detections = [detections[i] for i in indices]
-
-            # Call the tracker
-            tracker.predict()
-            tracker.update(detections)
-           # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
-
-            image_utils.draw_player_with_tracks(frame, tracker.tracks)
+            frame = detect(image, tracker, encoder, mask_rcnn)
             writer.append_data(frame)
     finally:
         writer.close()

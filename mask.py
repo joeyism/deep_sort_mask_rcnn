@@ -55,7 +55,7 @@ class Mask(object):
         self.xywh = image_utils.gen_xywh_from_box(rois)
 
         width, height = masked_image.size
-        self.upper_half = masked_image.crop((0, 0, width, int(height/2)))
+        self.upper_half = masked_image.crop((0, int(height/6), width, int(height/2)))
         self.upper_half_np = np.array(self.upper_half)
 
     def __repr__(self):

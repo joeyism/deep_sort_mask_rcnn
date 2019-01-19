@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, DBSCAN
 import numpy as np
 import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
@@ -31,6 +31,7 @@ def gen_xywh_from_box(box):
 
 def _int_(tup):
     return [int(tup_val) for tup_val in tup]
+
 
 def remove_background_and_average_colour(image_np, NUM_CLUSTERS=5):
     #only_coloured_pixels = np.array([pixel for pixel in image_np.reshape((-1, 3)) if pixel.tolist() != [0, 0, 0]])
@@ -135,10 +136,48 @@ def apply_masks_to_image_np(image_np, masks):
     return image_np, masks
 
 
-def draw_player_with_tracks(image_np, tracks):
+def draw_player_with_tracks(image_np, tracks, force=False):
     for track in tracks:
-        if not track.is_confirmed() or track.time_since_update > 1:
+        if (not track.is_confirmed() or track.time_since_update > 1) and not force:
             continue
         bbox = track.to_tlbr()
         cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), classified_colours[track.team_id], 2)
         cv2.putText(image_np, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, classified_colours[track.team_id], 2)
+
+
+def load_image_into_numpy_array(image):
+    (im_height, im_width, channels) = np.array(image).shape
+    try:
+        image_np = np.array(image)
+    except:
+        return image
+
+    if channels > 3:
+        image_np = image_np[:, :, :3]
+    return image_np.astype(np.uint8)
+
+
+def _pixel_is_black_(pixel):
+    return all(pixel == [0, 0, 0])
+
+def _mean_(l):
+    return sum(l)/len(l)
+
+def classify_masks_with_hash(masks, n_clusters=2):
+    all_colours = []
+    for i, mask in enumerate(masks):
+        flattened_colour = mask.upper_half_np.reshape((-1, 3))
+        flattened_colour = [pixel for pixel in flattened_colour if not _pixel_is_black_(pixel)]
+        all_colours.append(flattened_colour)
+
+    all_colours = np.concatenate(all_colours)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(all_colours)
+
+    colour_label_hashmap = dict(zip([str(colour) for colour in all_colours], kmeans.labels_))
+
+    for mask in masks:
+        flattened_colour = mask.upper_half_np.reshape((-1, 3))
+        flattened_colour = [pixel for pixel in flattened_colour if not _pixel_is_black_(pixel)]
+        mask.kmeans_label = round(_mean_([colour_label_hashmap[str(colour)] for colour in flattened_colour]))
+    return masks    
+
