@@ -59,7 +59,7 @@ def old_detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
     return frame
 
 
-def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
+def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False):
     masks = mask_rcnn.detect_people(frame)
     masks = image_utils.classify_masks_with_hash(masks)
 
@@ -79,7 +79,7 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
     tracker.predict()
     tracker.update(detections)
 
-    image_utils.draw_player_with_tracks(frame, tracker.tracks, force=True)
+    image_utils.draw_player_with_tracks(frame, tracker.tracks, force=force_draw)
     return frame, tracker
 
 
@@ -96,7 +96,7 @@ def main(mask_rcnn):
 
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
-    image, _ = detect(image.copy(), tracker, encoder, mask_rcnn)
+    image, _ = detect(image.copy(), tracker, encoder, mask_rcnn, force_draw=True)
     Image.fromarray(image).save("output/" + get_filename(filename))
 
 if __name__ == '__main__':
