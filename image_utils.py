@@ -166,6 +166,9 @@ def _stringify_colour(colour):
     return "{}, {}, {}".format(colour[0], colour[1], colour[2])
 
 def classify_masks_with_hash(masks):
+    if len(masks) == 0:
+        return masks
+
     all_colours = []
     for i, mask in enumerate(masks):
         mask.flattened_colour = mask.upper_half_np.reshape((-1, 3))
