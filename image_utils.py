@@ -6,7 +6,7 @@ import cv2
 import scipy
 import scipy.misc
 import scipy.cluster
-
+import line_profiler
 
 classified_colours = {
     0: (0, 0, 0),
@@ -14,8 +14,8 @@ classified_colours = {
     2: (125, 200, 255)
 }
 
-kmeans_init = KMeans(n_clusters=2, random_state=0)
 
+@profile
 def gen_xywh_from_box(box):
     x = int(box[1])  
     y = int(box[0])  
@@ -146,10 +146,11 @@ def draw_player_with_tracks(image_np, tracks, force=False):
         cv2.putText(image_np, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, classified_colours[track.team_id], 2)
 
 
+@profile
 def load_image_into_numpy_array(image):
-    (im_height, im_width, channels) = np.array(image).shape
     try:
         image_np = np.array(image)
+        (im_height, im_width, channels) = image_np.shape
     except:
         return image
 
@@ -164,6 +165,7 @@ def _pixel_is_black_(pixel):
 def _mean_(l):
     return sum(l)/len(l)
 
+@profile
 def classify_masks_with_hash(masks):
     all_colours = []
     for i, mask in enumerate(masks):
@@ -172,7 +174,7 @@ def classify_masks_with_hash(masks):
         all_colours.append(mask.flattened_colour)
 
     all_colours = np.concatenate(all_colours)
-    kmeans = kmeans_init.fit(all_colours)
+    kmeans = KMeans(n_clusters=2, random_state=0).fit(all_colours)
 
     colour_label_hashmap = dict(zip([str(colour) for colour in all_colours], kmeans.labels_))
 
