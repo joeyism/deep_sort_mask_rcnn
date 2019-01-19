@@ -19,7 +19,6 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imageio
 import image_utils
-import line_profiler
 warnings.filterwarnings('ignore')
 
 def get_filename(filename):
@@ -27,7 +26,6 @@ def get_filename(filename):
     return split[0].split("/")[-1] + split[1]
 
 
-@profile
 def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
     masks = mask_rcnn.detect_people(frame)
     masks = image_utils.classify_masks_with_hash(masks)
