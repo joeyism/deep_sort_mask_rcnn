@@ -26,46 +26,15 @@ def get_filename(filename):
     return split[0].split("/")[-1] + split[1]
 
 
-def old_detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap = 1.0):
-    masks = mask_rcnn.detect_people(frame)
-
-#TODO: change this to save the distribution, then split into teams by distribution instead of just by colour
-    for i, mask in enumerate(masks):
-        image_cropped = mask.upper_half_np
-        mask.average_colour = image_utils.remove_background_and_average_colour(image_cropped, NUM_CLUSTERS = 5)
-
-    masks = image_utils.classify_masks(masks, by="average_colour", n_clusters=2) #TODO: divide into teams better
-#    masks = image_utils.classify_masks_with_hash(masks)
-    boxs = masks.get_xywh()
-
-    # print("box_num",len(boxs))
-    features = encoder(frame, boxs)
-
-    # score to 1.0 here).
-    detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
-
-    # Run non-maxima suppression.
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
-    detections = [detections[i] for i in indices]
-
-    # Call the tracker
-    tracker.predict()
-    tracker.update(detections)
-   # _, masks = image_utils.apply_masks_to_image_np(frame, masks) #TODO: split into classify, then draw masks based on tracks
-
-    image_utils.draw_player_with_tracks(frame, tracker.tracks, force=True)
-    return frame
-
-
 def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False):
     masks = mask_rcnn.detect_people(frame)
-    masks = image_utils.classify_masks_with_hash(masks)
 
+    masks = image_utils.classify_masks_with_hash(masks)
     boxs = masks.get_xywh()
 
+
     features = encoder(frame, boxs)
+
 
     detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
 
@@ -80,7 +49,7 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=F
     tracker.update(detections)
 
     image_utils.draw_player_with_tracks(frame, tracker.tracks, force=force_draw)
-    return frame, tracker
+    return frame, tracker, encoder
 
 
 def main(mask_rcnn):

@@ -19,7 +19,7 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imageio
 import image_utils
-from detect import detect, old_detect
+from detect import detect
 warnings.filterwarnings('ignore')
 
 def get_filename(filename):
@@ -50,7 +50,7 @@ def main(mask_rcnn):
 
     try:
         for i, frame in tqdm(enumerate(reader), desc="Frames ", total=N):
-            frame, tracker = detect(frame, tracker, encoder, mask_rcnn)
+            frame, tracker, encoder = detect(frame, tracker, encoder, mask_rcnn)
             writer.append_data(frame)
     finally:
         writer.close()
