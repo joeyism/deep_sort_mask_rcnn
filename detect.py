@@ -41,13 +41,13 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=F
     features = encoder(frame, boxs)
 
 
-    detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)] #TODO: may need to clear previous detections
+    detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
 
     # Run non-maxima suppression.
     boxes = np.array([d.tlwh for d in detections])
     scores = np.array([d.confidence for d in detections])
-    #indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
-    #detections = [detections[i] for i in indices]
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #TODO: with maskrcnn, this may not be required
+    detections = [detections[i] for i in indices]
 
     # Call the tracker
     tracker.predict()
