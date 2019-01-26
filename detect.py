@@ -3,6 +3,7 @@
 from __future__ import division, print_function, absolute_import
 import sys
 import os
+import random
 
 import warnings
 import cv2
@@ -11,13 +12,13 @@ from PIL import Image
 from yolo import YOLO
 from mask import MaskRCNN
 from tqdm import tqdm
+import imageio
 
 from deep_sort import preprocessing
 from deep_sort import nn_matching
 from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
-import imageio
 import image_utils
 import tracker_utils
 warnings.filterwarnings('ignore')
@@ -51,7 +52,7 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=F
     # Call the tracker
     tracker.predict()
     tracker.update(detections)
-    if random.randint(0, 50) == 1:
+    if random.randint(0, 20) == 1:
         tracker_utils.remove_deleted_tracks(tracker)
 
     image_utils.draw_player_with_tracks(frame, tracker.tracks, force=force_draw)
