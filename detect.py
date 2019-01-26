@@ -29,6 +29,10 @@ def get_filename(filename):
 def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False):
     masks = mask_rcnn.detect_people(frame)
 
+    # skip if no of player si sthe same
+    #if len(tracker.tracks) != len(masks):
+    #    masks = image_utils.classify_masks_with_hash(masks)
+
     masks = image_utils.classify_masks_with_hash(masks)
     boxs = masks.get_xywh()
 

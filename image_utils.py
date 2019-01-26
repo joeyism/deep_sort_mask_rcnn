@@ -179,6 +179,10 @@ def classify_masks_with_hash(masks, n_clusters=2):
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(all_colours)
 
+    # lower number of colour = 0, so if first number is greater, flip labels
+    if _mean_(kmeans.cluster_centers_[0]) > _mean_(kmeans.cluster_centers_[1]):
+        kmeans.labels_ = [ 1 - val for val in kmeans.labels_]
+
     string_colours = [_stringify_colour(colour) for colour in all_colours]
     zip_colours = zip(string_colours, kmeans.labels_)
     colour_label_hashmap = dict(zip_colours)
