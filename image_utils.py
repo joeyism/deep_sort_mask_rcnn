@@ -159,6 +159,9 @@ def load_image_into_numpy_array(image):
 def _pixel_is_black_(pixel):
     return all(pixel == [0, 0, 0])
 
+def _pixel_is_black_wrapper(pixel):
+    return pixel if not _pixel_is_black_(pixel) else None
+
 def _mean_(l):
     return sum(l)/len(l)
 

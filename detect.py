@@ -19,12 +19,12 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imageio
 import image_utils
+import tracker_utils
 warnings.filterwarnings('ignore')
 
 def get_filename(filename):
     split = os.path.splitext(filename)
     return split[0].split("/")[-1] + split[1]
-
 
 def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False):
     masks = mask_rcnn.detect_people(frame)
@@ -51,6 +51,8 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=F
     # Call the tracker
     tracker.predict()
     tracker.update(detections)
+    if random.randint(0, 50) == 1:
+        tracker_utils.remove_deleted_tracks(tracker)
 
     image_utils.draw_player_with_tracks(frame, tracker.tracks, force=force_draw)
     return frame, tracker, encoder
@@ -69,7 +71,7 @@ def main(mask_rcnn):
 
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
-    image, _ = detect(image.copy(), tracker, encoder, mask_rcnn, force_draw=True)
+    image, _, _ = detect(image.copy(), tracker, encoder, mask_rcnn, force_draw=True)
     Image.fromarray(image).save("output/" + get_filename(filename))
 
 if __name__ == '__main__':
