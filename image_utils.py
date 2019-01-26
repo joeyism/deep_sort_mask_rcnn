@@ -165,7 +165,7 @@ def _mean_(l):
 def _stringify_colour(colour):
     return "{}, {}, {}".format(colour[0], colour[1], colour[2])
 
-def classify_masks_with_hash(masks):
+def classify_masks_with_hash(masks, n_clusters=2):
     if len(masks) == 0:
         return masks
 
@@ -177,7 +177,7 @@ def classify_masks_with_hash(masks):
     
     all_colours = np.concatenate(all_colours)
 
-    kmeans = KMeans(n_clusters=2, random_state=0).fit(all_colours)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(all_colours)
 
     string_colours = [_stringify_colour(colour) for colour in all_colours]
     zip_colours = zip(string_colours, kmeans.labels_)

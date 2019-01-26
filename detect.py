@@ -36,7 +36,7 @@ def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=F
     features = encoder(frame, boxs)
 
 
-    detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)]
+    detections = [Detection(mask.xywh, mask.score, feature, mask.kmeans_label) for mask, feature in zip(masks, features)] #TODO: may need to clear previous detections
 
     # Run non-maxima suppression.
     boxes = np.array([d.tlwh for d in detections])
