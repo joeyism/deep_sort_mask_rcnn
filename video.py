@@ -32,7 +32,6 @@ def main(mask_rcnn):
    # Definition of the parameters
     max_cosine_distance = 0.3
     nn_budget = None
-    nms_max_overlap = 1.0
 
    # deep_sort
     model_filename = 'model_data/mars-small128.pb'
