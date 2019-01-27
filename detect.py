@@ -27,8 +27,8 @@ def get_filename(filename):
     split = os.path.splitext(filename)
     return split[0].split("/")[-1] + split[1]
 
-def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False):
-    masks = mask_rcnn.detect_people(frame)
+def detect(frame, tracker, encoder, mask_rcnn, nms_max_overlap=1.0, force_draw=False, threshold=0.9):
+    masks = mask_rcnn.detect_people(frame, threshold=threshold)
 
     # skip if no of player si sthe same
     #if len(tracker.tracks) != len(masks):
