@@ -1,3 +1,5 @@
+import math
+
 from sklearn.cluster import KMeans, DBSCAN
 import numpy as np
 import PIL.Image as Image
@@ -134,6 +136,9 @@ def apply_masks_to_image_np(image_np, masks):
     draw_lines_between_classified_players(image_np, masks)
     return image_np, masks
 
+def _ceil_(num, to=10):
+    return int(math.ceil(num/to)*to)
+
 
 def draw_player_with_tracks(image_np, tracks, force=False):
     for track in tracks:
@@ -141,8 +146,9 @@ def draw_player_with_tracks(image_np, tracks, force=False):
             continue
         bbox = track.to_tlbr()
         center = (int((bbox[2] + bbox[0])/2), int(bbox[3]))
-        axes = (int((bbox[2] - bbox[0])), int((bbox[3] - bbox[1])/6))
-        thickness = 10 #int(axes[1]/2)
+        x_length = _ceil_(bbox[2] - bbox[0])
+        axes = (x_length, int(x_length/4)) # x length, y length
+        thickness = int(x_length/5) #int(axes[1]/2)
 
         #cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), classified_colours[track.team_id], 2)
         cv2.ellipse(image_np, center, axes, 0, 0, 360, color=classified_colours[track.team_id], thickness=thickness)
