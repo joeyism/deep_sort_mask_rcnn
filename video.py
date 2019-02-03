@@ -30,7 +30,7 @@ def main(mask_rcnn):
 
     filename = sys.argv[1]
    # Definition of the parameters
-    max_cosine_distance = 0.5
+    max_cosine_distance = 0.1
     nn_budget = None
 
    # deep_sort
