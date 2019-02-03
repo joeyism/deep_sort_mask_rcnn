@@ -140,7 +140,9 @@ def _ceil_(num, to=10):
     return int(math.ceil(num/to)*to)
 
 
-def draw_player_with_tracks(image_np, tracks, force=False):
+def draw_player_with_tracks(image_np, tracks, force=False, alpha=0.5):
+    overlay = image_np.copy()
+
     for track in tracks:
         if (not track.is_confirmed() or track.time_since_update > 1) and not force:
             continue
@@ -151,8 +153,10 @@ def draw_player_with_tracks(image_np, tracks, force=False):
         thickness = int(x_length/5) #int(axes[1]/2)
 
         #cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), classified_colours[track.team_id], 2)
-        cv2.ellipse(image_np, center, axes, 0, 0, 360, color=classified_colours[track.team_id], thickness=thickness)
-        cv2.putText(image_np, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, classified_colours[track.team_id], 2)
+        cv2.ellipse(overlay, center, axes, 0, 0, 360, color=classified_colours[track.team_id], thickness=thickness)
+        cv2.putText(overlay, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, classified_colours[track.team_id], 2)
+
+    cv2.addWeighted(overlay, alpha, image_np, 1 - alpha, 0, image_np)
 
 
 def load_image_into_numpy_array(image):
