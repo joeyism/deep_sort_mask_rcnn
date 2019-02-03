@@ -77,7 +77,6 @@ class Tracker:
 
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
-        self.tracks = [t for t in self.tracks if t.is_deleted()]
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
