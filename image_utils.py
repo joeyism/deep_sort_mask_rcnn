@@ -149,8 +149,8 @@ def draw_player_with_tracks(image_np, tracks, force=False, alpha=0.5):
         bbox = track.to_tlbr()
         center = (int((bbox[2] + bbox[0])/2), int(bbox[3]))
         x_length = _ceil_(bbox[2] - bbox[0])
-        axes = (x_length, int(x_length/4)) # x length, y length
-        thickness = int(x_length/5) #int(axes[1]/2)
+        axes = (int(x_length/2), int(x_length/8)) # x length, y length
+        thickness = int(x_length/8) #int(axes[1]/2)
 
         #cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), classified_colours[track.team_id], 2)
         cv2.ellipse(overlay, center, axes, 0, 0, 360, color=classified_colours[track.team_id], thickness=thickness)
