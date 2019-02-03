@@ -75,8 +75,6 @@ class Tracker:
         for track_idx in unmatched_tracks:
             self.tracks[track_idx].mark_missed()
 
-        self.tracks = [track for track in self.tracks if track.is_deleted()] # joeyism: delete instantly every time
-
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
         self.tracks = [t for t in self.tracks if t.is_deleted()]
